@@ -1,0 +1,38 @@
+name: PHP Web Server with Tailscale
+
+on: 
+  workflow_dispatch:
+    inputs:
+      tailscale_authkey:
+        description: 'Tailscale Auth Key'
+        required: true
+      computername:
+        description: 'Server Name'
+        default: 'php-server'
+        required: true
+      username:
+        description: 'SSH Username'
+        default: 'webadmin'
+        required: true
+      password:
+        description: 'SSH Password'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup PHP Web Server
+      run: |
+        sudo apt-get update
+        bash Setup.sh
+    - name: Show Connection Info
+      run: bash Ip.sh
+    - name: Keep Server Alive
+      run: |
+        echo "🔄 PHP Server is running..."
+        while true; do
+          echo "$(date): Server is alive - http://$(tailscale ip -4)/"
+          sleep 60
+        done
